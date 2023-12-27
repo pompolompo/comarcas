@@ -1,0 +1,113 @@
+---
+title: "Untitled"
+author: "Ferran Garcia"
+date: '`r Sys.Date()`'
+output: 
+  bookdown::pdf_document2:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(dplyr)
+```
+
+\newpage
+# Introducción
+
+En este trabajo proponemos una agrupación comarcal para la provincia de Málaga basándonos en los flujos de población entre municipios y la situación geográfica de los mismos. Cada municipio tendrá una cabecera y las comarcas estarán formadas por municipios colindantes.
+
+## Contexto
+
+En contraposición con otras comunidades españlas, las comarcas no son una figura arraigada en Andalucía a pesar de que se contemple en su estatuto de autonomía. En concreto Málaga no considera la comarca una agrupacón territorial como tal. Sin embargo las funciones públicas requieren cierta organización territorial. Para ello es necesario delimitar una estructura con mayor desagregación que la provincia que abarque más territorio que el municipio: La comarca
+
+## Objetivos
+
+\begin{itemize}
+
+  \item Proponer agrupaciones comarcales tales que:
+
+  \begin{enumerate}
+    \item Tengan una única cabecera
+    \item Estén justificadas en sentido geográfico
+    \item Cumplan las condiciones necesarias de colindancia\footnote{Todos los municipios de una comarca estén conectados a través de sus fronteras} y dependencia\footnote{La afluencia de personas hacia la cabecera sea considerableme}
+    \item Sean exhaustivas\footnote{Todos los municipios se incluyan en una comarca} y exclusivas\footnote{Cada municipio pertenezca únicamente a una comarca}
+  \end{enumerate}
+
+  \item Diseñar un algoritmo para la agrupación comarcal tal que:
+
+  \begin{enumerate}
+    \item La agrupación resultante satisfazca las condiciones necesarias
+    \item Permita llevar a cabo un aanálisis de sensibilidad mediante la modificación de sus parámetros
+    \item Su uso sea generalizable a agrupaciones comarcales de otras provincias con planteamiento similar
+  \end{enumerate}
+  
+  \item Matizar, modificar, representar y resumir los resultados obtenidos.
+  
+\end{itemize}
+
+
+## Estructura
+
+\begin{enumerate}
+
+\item Metodología
+
+\begin{enumerate}
+
+  \item Estudio descriptivo de los datos
+  \begin{enumerate}
+    \item Municipios de la provincia de Málaga
+    \item Flujos de población entre municipios
+  \end{enumerate}
+
+  \item Funcionamiento del algoritmo
+  \begin{enumerate}
+    \item Idea
+    \item Parámetros
+    \item Salida
+  \end{enumerate}
+
+\end{enumerate}
+
+\item Agrupación comarcal
+
+\begin{enumerate}
+
+  \item Justificación de los parámetros usados
+  \item Interpretación de la salida
+  \item Análisis de sensibilidad
+  \begin{itemize}
+    \item Pesos de los criterios\footnote{Se entiende por criterios los distintos motivos de desplazamiento demográfico entre municipios que conforman los flujos de dependencia}
+    \item Distancia de dependencia
+    \item Grado de colindancia
+  \end{itemize}
+
+\end{enumerate}
+
+\item Conclusiones
+\item Annexo
+
+\end{enumerate}
+
+\newpage
+
+# Metodología
+
+## Datos
+
+
+
+```{r}
+library(terra)
+malaga <- vect("data/shape_data/13_01_TerminoMunicipal.shp") %>%
+  .[which(.[["provincia"]] == "Málaga"), ]
+
+flujos <-  read.csv("data/flujos.csv")
+```
+
+
+## Algoritmo
+
+\newpage
+# Agrupación
