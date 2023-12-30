@@ -96,8 +96,6 @@ En contraposición con otras comunidades españlas, las comarcas no son una figu
 
 ## Datos
 
-
-
 ```{r}
 library(terra)
 malaga <- vect("data/shape_data/13_01_TerminoMunicipal.shp") %>%
@@ -108,6 +106,14 @@ flujos <-  read.csv("data/flujos.csv")
 
 
 ## Algoritmo
+
+```{r}
+# ponderación criterios
+w = matrix(c(.1, .25, .25, .15, .1, .1 , .05))
+flujo = flujos %>% select(origen, destino, colind, dist) %>%
+  bind_cols(flux = as.matrix(flujos[,3:9]) %*% w)
+```
+
 
 \newpage
 # Agrupación
