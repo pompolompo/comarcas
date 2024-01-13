@@ -1,5 +1,5 @@
 library(dplyr)
-
+source("funcs/codigo_nombre.R")
 ### tablas resumen ###
 
 # 8 municipios con con almenos 5 dependientes de mayor flujo entrante
