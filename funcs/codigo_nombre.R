@@ -52,7 +52,7 @@ codigo_nombre = function(tbl, # lo que queremos cambiar
   }
   
   # convierte a numérico
-  if(num){
+  if(num & nb_a_id){
     if(destino) tbl[["DESTINO"]] = as.numeric(tbl[["DESTINO"]])
     if(origen) tbl[["ORIGEN"]] = as.numeric(tbl[["ORIGEN"]])
     }
