@@ -1,5 +1,6 @@
 library(dplyr)
 library(mapsf)
+source("scripts/import.R")
 source("funcs/codigo_nombre.R")
 ### tablas resumen ###
 
