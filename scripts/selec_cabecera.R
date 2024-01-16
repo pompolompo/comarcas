@@ -39,14 +39,13 @@ normal = flux0 %>%
   ) %>% arrange(desc(ENTRANTE))
 
 # dependencia normalizada
-shp$depende = setNames(normal$ENTRANTE, normal$DESTINO)[shp$nombre]
-
-# tabla y gráfico (1)
 n = 10
-mf_theme("candy")
-mf_inset_off()
+shp$depende = setNames(normal$ENTRANTE, normal$DESTINO)[shp$nombre]
 shp$cabecera = ifelse(shp$nombre %in% normal$DESTINO[1:n],
                       "Cabecera", "Adherible")
+
+# tabla y gráfico (1)
+mf_theme("candy")
 
 mf_map(x = shp, var = "cabecera", type = "typo",
        leg_pos = "topleft", leg_frame = TRUE, leg_title = "Tipología")
