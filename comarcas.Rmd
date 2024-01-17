@@ -1,0 +1,128 @@
+---
+title: "Comarcas"
+author: "Ferran Garcia"
+date: "`r Sys.Date()`"
+output: 
+  bookdown::pdf_document2:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(dplyr)
+library(tidyr)
+library(mapsf)
+library(stringr)
+library(readxl)
+library(sf)
+library(kableExtra)
+```
+
+\newpage
+# Introducción
+
+En este trabajo proponemos una agrupación comarcal para la provincia de Málaga basándonos en los flujos de población entre municipios y la situación geográfica de los mismos. Cada municipio tendrá una cabecera y las comarcas estarán formadas por municipios colindantes.
+
+## Contexto
+
+En contraposición con otras comunidades españolas, las comarcas no son una figura arraigada en Andalucía a pesar de que se contemple en su estatuto de autonomía. En concreto Málaga no considera la comarca una agrupacón territorial como tal. Sin embargo las funciones públicas requieren cierta organización territorial. Para ello es necesario delimitar una estructura con mayor desagregación que la provincia que abarque más territorio que el municipio: La comarca
+
+## Objetivos
+
+\begin{itemize}
+
+  \item Proponer agrupaciones comarcales tales que:
+
+  \begin{enumerate}
+    \item Tengan una única cabecera
+    \item Estén justificadas en sentido geográfico
+    \item Cumplan las condiciones necesarias de colindancia\footnote{Todos los municipios de una comarca estén conectados a través de sus fronteras} y dependencia\footnote{La afluencia de personas hacia la cabecera sea considerableme}
+    \item Sean exhaustivas\footnote{Todos los municipios se incluyan en una comarca} y exclusivas\footnote{Cada municipio pertenezca únicamente a una comarca}
+  \end{enumerate}
+
+  \item Presentar un análisis descriptivo y gráfico que:
+
+  \begin{enumerate}
+    \item Permita caracterizar la tipología y dirección de los flujos 
+    \item Facilite la propuesta de cabeceras comarcales
+    \item Compare los flujos de múltiples municipios
+  \end{enumerate}
+  
+  \item Matizar, modificar, representar y resumir los resultados obtenidos.
+  
+\end{itemize}
+
+
+## Estructura
+
+\begin{enumerate}
+
+\item Metodología
+
+\begin{enumerate}
+
+  \item Estudio descriptivo de los datos
+  \item Herramientas utilizadas
+
+\end{enumerate}
+
+\item Agrupación comarcal
+
+\begin{enumerate}
+
+  \item Ponderación de los criterios
+  \item Selección de cabeceras
+  \item Adhesión de municipios
+  \item Análisis de sensibilidad
+
+\end{enumerate}
+
+\item Conclusiones
+\item Annexo
+
+\end{enumerate}
+
+\newpage
+
+# Metodología
+
+## Datos
+
+\begin{enumerate}
+  \item Municipios de la provincia de Málaga
+  \item Flujos de población entre municipios
+\end{enumerate}
+  
+```{r}
+source("scripts/import.R")
+source("scripts/descriptiva.R")
+```
+
+## Herramientas
+
+\begin{enumerate}
+  \item R
+  \item Paquetes
+  \item Scripts y funciones
+\end{enumerate}
+
+\newpage
+# Agrupación
+
+## Ponderación
+**Juestifcación de los pesos**
+
+## Cabeceras
+
+## Adhesión
+
+## Sensibilidad
+
+\newpage
+# Conclusiones
+
+\newpage
+# Annexo
+
+
+
