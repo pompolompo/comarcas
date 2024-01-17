@@ -73,12 +73,3 @@ for(m in sumas$DESTINO){
   mf_arrow(pos = "topright")
   
 }
-
-### -----------------ZONA DE PRUEBAS----------------------- ###
-
-for(i in 1:30){
-  mf_get_pal(n = 10, pal = hcl.pals()[i]) %>%
-    plot(0:1, 0:1, bg = ., pch = 22, cex = 4, main = hcl.pals()[i])
-  Sys.sleep(1.5)
-}
-
