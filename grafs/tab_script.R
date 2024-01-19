@@ -1,8 +1,47 @@
 source("scripts/import.R")
+source("scripts/prepara_flujos.R")
 source("scripts/descriptiva.R") # -> sumas
-### METODOLOGÍA ###
+### AGRUPACIÓN ###
 
-# 
+## descriptiva ##
+
+# tipología de desplazamientos
+desplaza = flux[,-c(1:2)] %>% colSums() %>%
+  data.frame(p = ./sum(.),
+             d = round(.)) %>%
+  arrange(desc(p)) %>%
+  mutate('Proporción' = round(p*100, 2) %>%
+           paste("%"), 
+         'Desplazamientos' = round(d),
+         .keep = "none") %>%
+  kable(booktabs = TRUE, format = "latex",
+        caption = "Personas desplazadas según motivo") %>%
+  kable_styling(latex_options = c("striped", "hold_position")) %>%
+  footnote(general = "Desplazamientos redondeados a números enteros",
+           general_title = "Nota:", footnote_as_chunk = TRUE)
+
+# tipología de desplazamientos, según distancia
+desplaza_km = mutate(flux00, d = ifelse(SE_TOCAN, 1, DISTANCIA)) %>%
+  mutate(across('COMERCIO':'OTROS SERV', 
+                ~.x*d*.001), .keep = "unused") %>%
+  .[,-c(1,2,10,11)] %>% colSums() %>%
+  data.frame(
+    km = round(.),
+    p = ./sum(.)
+  ) %>% arrange(desc(p)) %>%
+    mutate(
+    'Proporción' = round(p*100, 2) %>%
+      paste("%"),
+    km = round(km),
+    .keep = "none"
+  )  %>%
+  kable(booktabs = TRUE, format = "latex",
+        caption = "Personas desplazadas según motivo") %>%
+  kable_styling(latex_options = c("striped", "hold_position")) %>%
+  footnote(general = "Kilómetros redondeados a números enteros",
+           general_title = "Nota:", footnote_as_chunk = TRUE)
+
+# top7 destinos
 top7 = sumas %>% rename(
   Destino = 'DESTINO',
   tot = 'TOTAL',
@@ -25,4 +64,12 @@ top7 = sumas %>% rename(
   footnote(general_title = "Unidad de medida",
            general = "Flujos en miles de pesonas",
            footnote_as_chunk = TRUE, title_format = "underline")
+  
+## ponderación ##
+
+row.names(w) = names(flux)[-c(1,2)]
+colnames(w) = "Peso"
+pondera = kable(w, booktabs = TRUE, format = "latex",
+                caption = "Ponderación para la agregación de tipologías de desplazamiento") %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
   
