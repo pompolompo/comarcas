@@ -16,6 +16,7 @@ library(stringr)
 library(readxl)
 library(sf)
 library(ggplot2)
+library(knitr)
 library(kableExtra)
 ```
 
@@ -125,13 +126,84 @@ Manejamos los datos que hemos introducido en la sección anterior usando las her
 
 \newpage
 # Agrupación
+```{r}
+source("grafs/tab_script.R")
+```
+
+Hemos dividido el proceso de agrupación comarcal en 5 partes:
+
+\begin{enumerate}
+  \item Breve análisis descriptivo de los flujos: Con tal de hacernos una idea general de los flujos de personas entre municipios tratamos de responder a cuestiones cómo ¿Por qué se desplazan las personas? ¿Hacia dónde? ¿En qué medida?
+  \item Ponderación de los criterios: Proponemos pesos para agregar los criterios basándonos en la importancia de cada motivo de desplazamiento.
+  \item Selección de cabeceras
+  \item Adhesión de municipios
+  \item Análisis de sensibilidad
+\end{enumerate}
+
+\newpage
+## Descriptiva
+
+Veamos qué cantidad de personas se desplaza según el motivo. Para ello la tabla 1 recoge la proporción de flujos que causa cada una de las tipologías. Por otra parte hemos calculado los kilómetros que se recorren en función del motivo del desplazamiento, los hemos representado en la tabla 2. También se pueden consultar los gráficos correspondientes en el annexo.
+
+```{r tab-1, echo = FALSE, out.width="75%", fig.align='center', fig.show='hold'}
+desplaza
+```
+
+```{r, tab-2, echo = FALSE, out.width="75%", fig.align='center', fig.show='hold'}
+desplaza_km
+```
+
+El motivo mayoritario de los desplazamientos es el administrativo, prácticamente uno de cada tres desplazamientos responde a esta causa. Lo siguen otra tipología especialmente relevante para el sector público: Los motivos educativos corresponden a uno de cada cinco desplazamientos intermunicipales dentro de la provincia de Málaga. Entonces más de la mitad de desplazamientos se hacen por motivos administrativos o de educación. A éstos les siguen las motivaciones comerciales y de sanidad, luego en medida bastante menor ocio, transportes y otros generan en conjunto menos de un 15% de los desplazamientos. Los kilómetros recorridos
 
 
+Por otra parte
+
+
+Nos fijamos en las localidades que reciben mayor afluencia de personas: Apreciamos una diferencia muy importante entre el destino más importante y el segundo. La capital malagueña recibe flujos de prácticamente todas las localidades de la provincia (91 de 102), los desplazamientos totales hacia Málaga son 9 veces mayores que hacia Vélez-Málaga, la segunda localidad con más dependencias. Sospechamos que tras ponderar los motivos seguirá liderando la lista con diferencia. 
+
+```{r, echo=FALSE, fig.show='hold'}
+top7
+```
+
+Más allá de los criterios puramente numéricos, para la agrupación comarcal es importante fijarse en la situación geográfica de los municipios ya que conviene seleccionar cabeceras que alberguen desplazamientos de zonas diferentes. Veamos dónde están situados los siete candidatos anteriores.
+
+```{r, echo = FALSE, out.width = "75%", fig.align='center', fig.show='hold'}
+#| fig.cap = "Localización de los municipios con mayor afluencia"
+include_graphics("grafs/descr_2.png")
+```
+
+Notamos que cubren relativamente bien la extensión de la provincia, sin embargo hay algunas cuestiones que requieren especial atención: No conviene que las cabeceras estén muy cercanas entre sí ya que en tal caso los competirán por los flujos de localidades entre ellas. También es preferible que las cabeceras estén alejadas ya que así se cubrirá la provincia completa con un menor número de cabeceras sin que sean excesivamente grandes. En este caso Estepona y Marbella son colindantes. También vemos que Málaga y Vélez-Málaga están reltivamente cerca. Probablemente tendremos que decidir con qué cabecera nos quedamos para cada pareja. Sin embargo existen criterios discordantes: Marbella recibe mayor afluencia que Estepona, pero ésta última está más lejos de otras cabeceras y es posible que recoja los flujos de una zona en particular. Más adelante trataremos estas cuestiones en mayor profundidad.
+
+Una cuestión no menos importante es la abismal diferencia entre la capital y el resto de municipios en cuanto a la categoría de destino de flujos. Como hemos visto antes, Málaga recibe muchos más desplazamientos que cualquier otro municipio. Vemos si ocurre lo mismo, en menor medida, con las siguientes localidades de la lista. El siguiente gráfico muestra la proporción de flujos que reciben los destinos más importates respecto al total, se pinta en rojo los grupos que no alcanzan el 75% de los flujos.
+
+Notamos una diferencia importante entre el caso en el que tenemos en cuenta la capital y el caso en el que no. En el primero, con dos municipios ya acumulamos tres de cada cuatro desplazamientos mientras que en el segundo se necesitan almenos cuatro municipios. Así remarcamos la relevancia de Málaga para toda la provincia.
+
+```{r, echo = FALSE, out.width = "75%", fig.align='center'}
+#| fig.cap = "Proporción de flujos recibidos por los n municipios con mayor afluencia. 
+#| Se distingue el caso con la capital y si ella.
+#| En azul los númeeros de destinos que conjuntamente superan el 75% de los flujos totales"
+include_graphics("grafs/descr_3.png")
+```
+
+Qué esperamos tras ponderar?
+Qué potenciales problemas habrá?
 
 ## Ponderación
-**Juestifcación de los pesos**
+
+Las ponderaciones que utilizaremos son las siguientes:
+
+```{r, echo = FALSE}
+pondera
+```
+
+**Justifcación de los pesos**
 
 ## Cabeceras
+
+```{r, echo = FALSE, fig.align='center', out.width="50%"}
+
+```
+
 
 ## Adhesión
 
@@ -143,6 +215,13 @@ Manejamos los datos que hemos introducido en la sección anterior usando las her
 \newpage
 # Annexo
 
-![](grafs/metodo_1.png){fig.align='center'}
-![](grafs/metodo_2.png){fig.align='center'}
+## Gráficos 
+```{r descr-1, echo = FALSE, out.width="50%", fig.align='center', fig.show='hold'}
+#| fig.cap = "Cantidad de personas desplazadas según el motivo."
+include_graphics("grafs/descr_1.png")
+```
 
+```{r descr-2, echo = FALSE, out.width="50%", fig.align='center', fig.show='hold'}
+#| fig.cap = "Cantidad de personas desplazadas según el motivo."
+include_graphics("grafs/descr_11.png")
+```
