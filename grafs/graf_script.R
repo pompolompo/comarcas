@@ -1,12 +1,13 @@
 library(ggplot2)
 source("scripts/import.R")
 source("scripts/descriptiva.R")
+source("scripts/prepara_flujos.R")
+source("scripts/selec_cabecera.R")
 ### AGRUPACIÓN ###
 
 ## descriptiva ##
 
 # tipología de los desplazamientos totales ---> descr_1
-dev.new()
 flux[,-c(1:2)] %>% colSums() %>%
   data.frame(Tipo = names(.),
              Flujo = .) %>%
@@ -18,6 +19,22 @@ flux[,-c(1:2)] %>% colSums() %>%
     axis.ticks.x = element_blank(),
     legend.title = element_blank()
   ) + ggtitle("Tipología de los desplazamientos totales")
+
+# km de desplazamiento según tipología --> descr_11
+mutate(flux00, d = ifelse(SE_TOCAN, 1, DISTANCIA)) %>%
+  mutate(across('COMERCIO':'OTROS SERV', 
+                ~.x*d*.001), .keep = "unused") %>%
+  .[,-c(1,2,10,11)] %>% colSums() %>%
+  data.frame(Tipo = names(.),
+             Flujo = .) %>%
+  ggplot(aes(x = Tipo, y = Flujo, fill = Tipo)) +
+  geom_col() +
+  theme_bw() + theme(
+    axis.title = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.title =  NULL
+  ) + ggtitle("Tipología de los km totales")
 
 # 7 destinos con mayor flujo entrante --- descr_2
 aux0 = mutate(shp, top7 = nombre %in% sumas$DESTINO[1:7])
@@ -53,7 +70,6 @@ data.frame(
   facet_wrap(vars(con_capital)) +
   ylab(NULL) + theme_bw() + theme(legend.position = "none")
 ggsave("grafs/descr_3.png")
-
 
 ### SELECCIÓN CABECERAS ###
 
