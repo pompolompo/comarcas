@@ -1,9 +1,25 @@
 library(ggplot2)
 source("scripts/import.R")
 source("scripts/descriptiva.R")
-### METODOLOGÍA ###
+### AGRUPACIÓN ###
 
-# 10 destinos con mayor flujo entrante --- graf_1
+## descriptiva ##
+
+# tipología de los desplazamientos totales ---> descr_1
+dev.new()
+flux[,-c(1:2)] %>% colSums() %>%
+  data.frame(Tipo = names(.),
+             Flujo = .) %>%
+  ggplot(aes(x = Tipo, y = Flujo, fill = Tipo)) +
+  geom_col() +
+  theme_bw() + theme(
+    axis.title = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.title = element_blank()
+  ) + ggtitle("Tipología de los desplazamientos totales")
+
+# 7 destinos con mayor flujo entrante --- descr_2
 aux0 = mutate(shp, top7 = nombre %in% sumas$DESTINO[1:7])
 aux1 = filter(aux0, top7) %>%
   .[order(.[["nombre"]]), ] %>%
@@ -11,7 +27,7 @@ aux1 = filter(aux0, top7) %>%
   .[order(.[["flujo"]], decreasing = TRUE),] %>%
   mutate(pinta = paste0(1:7, ". ", nombre))
 
-mf_export(x = aux0, filename = "grafs/metodo_1.png", width = 1000)
+mf_export(x = aux0, filename = "grafs/descr_2.png", width = 1000)
 mf_theme("candy")
 
 mf_map(aux0, var = "top7", type ="typo", leg_pos = "topright", leg_frame = TRUE)
@@ -25,7 +41,7 @@ mf_layout(title = "Municipios con mayor flujo entrante",
 dev.off()
 
 
-# proporción de flujos en los 7 municipios más importantes
+# proporción de flujos en los 7 municipios más importantes --> descr_3
 data.frame(
   con_capital = rep(c("Con Málaga", "Sin Málaga"), each = 7),
   prop = c(cumsum(sumas$TOTAL[1:7])/sum(sumas$TOTAL),
@@ -36,7 +52,7 @@ data.frame(
   geom_col() +
   facet_wrap(vars(con_capital)) +
   ylab(NULL) + theme_bw() + theme(legend.position = "none")
-ggsave("grafs/metodo_2.png")
+ggsave("grafs/descr_3.png")
 
 
 ### SELECCIÓN CABECERAS ###
