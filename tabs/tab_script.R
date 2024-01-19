@@ -3,7 +3,7 @@ source("scripts/descriptiva.R") # -> sumas
 ### METODOLOGÍA ###
 
 # 
-sumas %>% rename(
+top7 = sumas %>% rename(
   Destino = 'DESTINO',
   tot = 'TOTAL',
   com = 'COMERCIO',
@@ -24,6 +24,5 @@ sumas %>% rename(
            footnote_as_chunk = FALSE, title_format = "underline") %>%
   footnote(general_title = "Unidad de medida",
            general = "Flujos en miles de pesonas",
-           footnote_as_chunk = TRUE, title_format = "underline") %>%
-  save_kable("tabs/top7.png")
+           footnote_as_chunk = TRUE, title_format = "underline")
   
