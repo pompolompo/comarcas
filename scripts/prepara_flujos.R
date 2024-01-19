@@ -32,3 +32,8 @@ flux0$SE_TOCAN = tocan[a, b] %>% diag()
 flux0$DISTANCIA = dist[a, b] %>% diag() #%>% 
 #  cut(breaks = c(-Inf, 1000, 5000, 25000, 500000, Inf), 
 #      labels = c("MUY CERCA", "CERCA", "MEDIA", "LEJOS", "MUY LEJOS"))
+
+# distancia y colindancia sin ponderar
+flux00 = flux
+flux00$SE_TOCAN = tocan[a, b] %>% diag()
+flux00$DISTANCIA = dist[a, b] %>% diag()
