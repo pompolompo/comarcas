@@ -5,10 +5,11 @@ date: "`r Sys.Date()`"
 output: 
   bookdown::pdf_document2:
     toc: true
+    extra_dependencies: ["float"]
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.pos = "H", out.extra = "")
 library(dplyr)
 library(tidyr)
 library(mapsf)
@@ -143,40 +144,30 @@ Hemos dividido el proceso de agrupación comarcal en 5 partes:
 \newpage
 ## Descriptiva
 
-Veamos qué cantidad de personas se desplaza según el motivo. Para ello la tabla 1 recoge la proporción de flujos que causa cada una de las tipologías. Por otra parte hemos calculado los kilómetros que se recorren en función del motivo del desplazamiento, los hemos representado en la tabla 2. También se pueden consultar los gráficos correspondientes en el annexo.
+Veamos qué cantidad de personas se desplaza según el motivo. Para ello la tabla 1 recoge la proporción de flujos que causa cada una de las tipologías. Por otra parte hemos calculado los kilómetros que se recorren en función del motivo del desplazamiento, los hemos representado en la misma tabla. También se pueden consultar los gráficos correspondientes en el annexo.
 
-```{r tab-1, echo = FALSE, out.width="75%", fig.align='center', fig.show='hold'}
+```{r, echo = FALSE, out.width="75%", fig.align='center', fig.show='hold'}
 desplaza
-```
-
-```{r, tab-2, echo = FALSE, out.width="75%", fig.align='center', fig.show='hold'}
-desplaza_km
 ```
 
 El motivo mayoritario de los desplazamientos es el administrativo, prácticamente uno de cada tres desplazamientos responde a esta causa. Lo siguen otra tipología especialmente relevante para el sector público: Los motivos educativos corresponden a uno de cada cinco desplazamientos intermunicipales dentro de la provincia de Málaga. Entonces más de la mitad de desplazamientos se hacen por motivos administrativos o de educación. A éstos les siguen las motivaciones comerciales y de sanidad, luego en medida bastante menor ocio, transportes y otros generan en conjunto menos de un 15% de los desplazamientos. Los kilómetros recorridos
 
-
-Por otra parte
-
-
-Nos fijamos en las localidades que reciben mayor afluencia de personas: Apreciamos una diferencia muy importante entre el destino más importante y el segundo. La capital malagueña recibe flujos de prácticamente todas las localidades de la provincia (91 de 102), los desplazamientos totales hacia Málaga son 9 veces mayores que hacia Vélez-Málaga, la segunda localidad con más dependencias. Sospechamos que tras ponderar los motivos seguirá liderando la lista con diferencia. 
+Ahora nos fijamos en las localidades que reciben mayor afluencia de personas, la tabla 3 muestra los 7 municipios que son destino de mayor flujo total. También se puede leer la cantidad de municipios que dependen de cada uno de ellos. Más allá de los criterios puramente numéricos, para la agrupación comarcal es importante fijarse en la situación geográfica de los municipios ya que conviene seleccionar cabeceras que alberguen desplazamientos de zonas diferentes. Veamos dónde están situados los siete candidatos anteriores. Para ello nos fijamos en la figura 1, que sitúa los 7 municipios de la tabla en el mapa.
 
 ```{r, echo=FALSE, fig.show='hold'}
 top7
 ```
 
-Más allá de los criterios puramente numéricos, para la agrupación comarcal es importante fijarse en la situación geográfica de los municipios ya que conviene seleccionar cabeceras que alberguen desplazamientos de zonas diferentes. Veamos dónde están situados los siete candidatos anteriores.
+Apreciamos una diferencia muy importante entre el primer destino más importante y el segundo. La capital malagueña recibe flujos de prácticamente todas las localidades de la provincia (91 de 102), los desplazamientos totales hacia Málaga son 9 veces mayores que hacia Vélez-Málaga, la segunda localidad con más dependencias. Sospechamos que tras ponderar los motivos seguirá liderando la lista con diferencia. 
 
-```{r, echo = FALSE, out.width = "75%", fig.align='center', fig.show='hold'}
+```{r, echo = FALSE, out.width = "100%", fig.align='center', fig.show='hold'}
 #| fig.cap = "Localización de los municipios con mayor afluencia"
 include_graphics("grafs/descr_2.png")
 ```
 
-Notamos que cubren relativamente bien la extensión de la provincia, sin embargo hay algunas cuestiones que requieren especial atención: No conviene que las cabeceras estén muy cercanas entre sí ya que en tal caso los competirán por los flujos de localidades entre ellas. También es preferible que las cabeceras estén alejadas ya que así se cubrirá la provincia completa con un menor número de cabeceras sin que sean excesivamente grandes. En este caso Estepona y Marbella son colindantes. También vemos que Málaga y Vélez-Málaga están reltivamente cerca. Probablemente tendremos que decidir con qué cabecera nos quedamos para cada pareja. Sin embargo existen criterios discordantes: Marbella recibe mayor afluencia que Estepona, pero ésta última está más lejos de otras cabeceras y es posible que recoja los flujos de una zona en particular. Más adelante trataremos estas cuestiones en mayor profundidad.
+Notamos que los 7 municipios más importantes cubren relativamente bien la extensión de la provincia, sin embargo hay algunas cuestiones que requieren especial atención: No conviene que las cabeceras estén muy cercanas entre sí ya que en tal caso los competirán por los flujos de localidades entre ellas. También es preferible que las cabeceras estén alejadas ya que así se cubrirá la provincia completa con un menor número de cabeceras sin que sean excesivamente grandes. En este caso Estepona y Marbella son colindantes. También vemos que Málaga y Vélez-Málaga están reltivamente cerca. Probablemente tendremos que decidir con qué cabecera nos quedamos para cada pareja. Sin embargo existen criterios discordantes: Marbella recibe mayor afluencia que Estepona, pero ésta última está más lejos de otras cabeceras y es posible que recoja los flujos de una zona en particular. Más adelante trataremos estas cuestiones en mayor profundidad.
 
-Una cuestión no menos importante es la abismal diferencia entre la capital y el resto de municipios en cuanto a la categoría de destino de flujos. Como hemos visto antes, Málaga recibe muchos más desplazamientos que cualquier otro municipio. Vemos si ocurre lo mismo, en menor medida, con las siguientes localidades de la lista. El siguiente gráfico muestra la proporción de flujos que reciben los destinos más importates respecto al total, se pinta en rojo los grupos que no alcanzan el 75% de los flujos.
-
-Notamos una diferencia importante entre el caso en el que tenemos en cuenta la capital y el caso en el que no. En el primero, con dos municipios ya acumulamos tres de cada cuatro desplazamientos mientras que en el segundo se necesitan almenos cuatro municipios. Así remarcamos la relevancia de Málaga para toda la provincia.
+Una cuestión no menos importante es la abismal diferencia entre la capital y el resto de municipios en cuanto a la categoría de destino de flujos. Como hemos visto antes, Málaga recibe muchos más desplazamientos que cualquier otro municipio. Vemos si ocurre lo mismo, en menor medida, con las siguientes localidades de la lista. El gráfico de la figura 2 ilustra la proporción de flujos que reciben los destinos más importates respecto al total, se pinta en rojo los grupos que no alcanzan el 75% de los flujos.
 
 ```{r, echo = FALSE, out.width = "75%", fig.align='center'}
 #| fig.cap = "Proporción de flujos recibidos por los n municipios con mayor afluencia. 
@@ -185,12 +176,14 @@ Notamos una diferencia importante entre el caso en el que tenemos en cuenta la c
 include_graphics("grafs/descr_3.png")
 ```
 
-Qué esperamos tras ponderar?
-Qué potenciales problemas habrá?
+Vemos que existe una diferencia importante entre el caso en el que tenemos en cuenta la capital y el caso en el que no. En el primero, con dos municipios ya acumulamos tres de cada cuatro desplazamientos mientras que en el segundo se necesitan almenos cuatro municipios. Así remarcamos la relevancia de Málaga para toda la provincia.
 
-## Ponderación
+\newpage
+## Ponderación, normalización y agragación
 
-Las ponderaciones que utilizaremos son las siguientes:
+Es más sencillo tomar decisiones si consideramos una única medida que si tenemos en cuenta varias, pero si solo nos fijamos en un criterio perderemos información sobre la situación. En este apartado motivamos, explicamos y justificamos el proceso que nos lleva de múltiples medidas a una única. Hemos tenido en cuenta dos características al poderar los flujos: La tipología del motivo de desplazamiento y la localización demográfica en términos de distancia de un municipio a otro. 
+
+Por un lado la tipología: Algunos motivos de desplazamientos son más importantes desde el punto de vista de la agregación comarcal que otros, por tanto calculamos una media ponderada en función de la importancia que le asignamos a cada motivo. Cabe remarcar que, a pesar de contar con una justificación, dichas ponderaciones heredan un punto de vista subjetivo y por ende son suceptibles de un análisis de sensibilidad. Las ponderaciones que utilizamos son las siguientes:
 
 ```{r, echo = FALSE}
 pondera
@@ -198,15 +191,30 @@ pondera
 
 **Justifcación de los pesos**
 
+Por otro lado la situación geográfica: Nos interesa seleccionar un número de cabeceras y comarcas adecuado, que cubran la totalidad de la provincia. De manera que es importante que las cabeceras seleccionadas sean de vital importancia sobre todo para los municipios de la comarca, es decir aquellos que se encuentren cerca de ésta. Los flujos recibidos desde lejos también se deben tener en cuenta pues indican que el municipio en cuestión es importante, pero en menor medida con tal de seleccionar comarcas estrechamente relacionadas con municipios cercanos. Para tenerlo en cuenta hemos ponderado los flujos intermunicipales según la distancia que separa el municipio de origen y el destino en kilómetros.
+
+Así pues usaremos múltiples medidas agregadas que tenemos que volver a agregar para convertitir en una. Para poder hacerlo éstas deben estar en la misma escala. La solución que proponemos es usar el método Nadir, que consites en reescalar todas la medidas a un rango entre cero y uno. Siendo el máximo igual a uno y el mínimo igual a cero. Las nuvas medidas normalizadas ($y_i$)las da el siguiente cálculo dondo las medidas sin normalizar son $x_i$:
+
+$$
+y_i = \frac{x_i - \min{x}}{\max{x}} 
+$$
+
+Otra cuestión de interés es la medida escogida para representar la dependencia: Tenemos en cuenta la suma y la media porqué nos aportan información ligeramente distinta. Es sencillo de ilustrar con un ejemplo: Si un municipio tiene un único flujo entrante relativamente alto tendrá una suma baja mientras que su media será alta. Este es el caso de Fuengirola, que sólo recibe desplazamientos desde Mijas, pero en una cantidad considerable. Por otra parte un municipio como Ronda tiene un total de 24 municipios dependientes y la cuarta suma más alta (sin ponderar), en cambio si nos fijamos en su media es la novena ya que a ese total contribuyen muchas localidades. De modo que para tener en cuenta ambos estadísticos hemos agrgado las todas las medidas normalizadas calculando su media aritmética.
+
+
+
+
+\newpage
 ## Cabeceras
 
 ```{r, echo = FALSE, fig.align='center', out.width="50%"}
 
 ```
 
-
+\newpage
 ## Adhesión
 
+\newpage
 ## Sensibilidad
 
 \newpage
