@@ -5,23 +5,8 @@ source("scripts/descriptiva.R") # -> sumas
 
 ## descriptiva ##
 
-# tipología de desplazamientos
-desplaza = flux[,-c(1:2)] %>% colSums() %>%
-  data.frame(p = ./sum(.),
-             d = round(.)) %>%
-  arrange(desc(p)) %>%
-  mutate('Proporción' = round(p*100, 2) %>%
-           paste("%"), 
-         'Desplazamientos' = round(d),
-         .keep = "none") %>%
-  kable(booktabs = TRUE, format = "latex",
-        caption = "Personas desplazadas según motivo") %>%
-  kable_styling(latex_options = c("striped", "hold_position")) %>%
-  footnote(general = "Desplazamientos redondeados a números enteros",
-           general_title = "Nota:", footnote_as_chunk = TRUE)
-
-# tipología de desplazamientos, según distancia
-desplaza_km = mutate(flux00, d = ifelse(SE_TOCAN, 1, DISTANCIA)) %>%
+# tipología de desplazamientos, en número y según distancia
+desplaza = mutate(flux00, d = ifelse(SE_TOCAN, 1, DISTANCIA)) %>%
   mutate(across('COMERCIO':'OTROS SERV', 
                 ~.x*d*.001), .keep = "unused") %>%
   .[,-c(1,2,10,11)] %>% colSums() %>%
@@ -30,15 +15,25 @@ desplaza_km = mutate(flux00, d = ifelse(SE_TOCAN, 1, DISTANCIA)) %>%
     p = ./sum(.)
   ) %>% arrange(desc(p)) %>%
     mutate(
-    'Proporción' = round(p*100, 2) %>%
+    'Proporción ' = round(p*100, 2) %>%
       paste("%"),
     km = round(km),
     .keep = "none"
-  )  %>%
+  )  %>%  select('Proporción ', 'km') %>%
+  bind_cols(., 
+            flux[,-c(1:2)] %>% colSums() %>%
+              data.frame(p = ./sum(.),
+                         d = round(.)) %>%
+              arrange(desc(p)) %>%
+              mutate(' Proporción' = round(p*100, 2) %>%
+                       paste("%"), 
+                     'Desplazamientos' = round(d),
+                     .keep = "none") %>% select(' Proporción', 'Desplazamientos')) %>%
   kable(booktabs = TRUE, format = "latex",
-        caption = "Personas desplazadas según motivo") %>%
+        caption = "Personas desplazadas y km según motivo") %>%
   kable_styling(latex_options = c("striped", "hold_position")) %>%
-  footnote(general = "Kilómetros redondeados a números enteros",
+  add_header_above(c("", "Kilómetros" = 2, "Desplazamientos" = 2)) %>%
+  footnote(general = "Desplazamientos y kilómetros redondeados a números enteros",
            general_title = "Nota:", footnote_as_chunk = TRUE)
 
 # top7 destinos
