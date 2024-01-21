@@ -161,7 +161,7 @@ top7
 Apreciamos una diferencia muy importante entre el primer destino más importante y el segundo. La capital malagueña recibe flujos de prácticamente todas las localidades de la provincia (91 de 102), los desplazamientos totales hacia Málaga son 9 veces mayores que hacia Vélez-Málaga, la segunda localidad con más dependencias. Sospechamos que tras ponderar los motivos seguirá liderando la lista con diferencia. 
 
 ```{r, echo = FALSE, out.width = "100%", fig.align='center', fig.show='hold'}
-#| fig.cap = "Localización de los municipios con mayor afluencia"
+#| fig.cap = "Localización de los 7 municipios con mayor afluencia"
 include_graphics("grafs/descr_2.png")
 ```
 
@@ -193,22 +193,110 @@ pondera
 
 Por otro lado la situación geográfica: Nos interesa seleccionar un número de cabeceras y comarcas adecuado, que cubran la totalidad de la provincia. De manera que es importante que las cabeceras seleccionadas sean de vital importancia sobre todo para los municipios de la comarca, es decir aquellos que se encuentren cerca de ésta. Los flujos recibidos desde lejos también se deben tener en cuenta pues indican que el municipio en cuestión es importante, pero en menor medida con tal de seleccionar comarcas estrechamente relacionadas con municipios cercanos. Para tenerlo en cuenta hemos ponderado los flujos intermunicipales según la distancia que separa el municipio de origen y el destino en kilómetros.
 
-Así pues usaremos múltiples medidas agregadas que tenemos que volver a agregar para convertitir en una. Para poder hacerlo éstas deben estar en la misma escala. La solución que proponemos es usar el método Nadir, que consites en reescalar todas la medidas a un rango entre cero y uno. Siendo el máximo igual a uno y el mínimo igual a cero. Las nuvas medidas normalizadas ($y_i$)las da el siguiente cálculo dondo las medidas sin normalizar son $x_i$:
+Así pues usaremos múltiples medidas agregadas que tenemos que volver a agregar para convertitir en una. Para poder hacerlo éstas deben estar en la misma escala. La solución que proponemos es usar el método Nadir, que consites en reescalar todas la medidas a un rango entre cero y uno. Siendo el máximo igual a uno y el mínimo igual a cero. Las nuvas medidas normalizadas ($y_i$) las da el siguiente cálculo donde las medidas sin normalizar son $x_i$:
 
 $$
-y_i = \frac{x_i - \min{x}}{\max{x}} 
+y_i = \frac{x_i - \min(x)}{\max(x) - \min(x)} 
 $$
 
-Otra cuestión de interés es la medida escogida para representar la dependencia: Tenemos en cuenta la suma y la media porqué nos aportan información ligeramente distinta. Es sencillo de ilustrar con un ejemplo: Si un municipio tiene un único flujo entrante relativamente alto tendrá una suma baja mientras que su media será alta. Este es el caso de Fuengirola, que sólo recibe desplazamientos desde Mijas, pero en una cantidad considerable. Por otra parte un municipio como Ronda tiene un total de 24 municipios dependientes y la cuarta suma más alta (sin ponderar), en cambio si nos fijamos en su media es la novena ya que a ese total contribuyen muchas localidades. De modo que para tener en cuenta ambos estadísticos hemos agrgado las todas las medidas normalizadas calculando su media aritmética.
-
-
-
+Otra cuestión de interés es la medida escogida para representar la dependencia: Tenemos en cuenta la suma y la media porqué nos aportan información ligeramente distinta. Es sencillo de ilustrar con un ejemplo: Si un municipio tiene un único flujo entrante relativamente alto tendrá una suma baja mientras que su media será alta. Este es el caso de Fuengirola, que sólo recibe desplazamientos desde Mijas, pero en una cantidad considerable. Por otra parte un municipio como Ronda tiene un total de 24 municipios dependientes y la cuarta suma más alta (sin ponderar), en cambio si nos fijamos en su media es la novena ya que a ese total contribuyen muchas localidades. De modo que para tener en cuenta ambos estadísticos hemos agrgado las todas las medidas normalizadas calculando su media aritmética. Finalmente volvemos a apliar la normalización para facilitar la interpretación.
 
 \newpage
 ## Cabeceras
 
-```{r, echo = FALSE, fig.align='center', out.width="50%"}
+Ahora qu hemos reducido los múltiples criterios a uno solo, veamos qué municipios son los que reciben mayor afluencia de personas desde otras localidades. Podemos interpretar la cantidad entrante como el ratio de puntuación en comparación con el municipio más importante, Málaga.
 
+```{r, echo = FALSE, fig.align='center', out.width="50%"}
+norma0
+```
+
+Nos fijamos en alguna anomalía, como hemos comentado antes, Fuengirola tiene una media muy alta a consecuencia de recibir a muchas personas únicamente dese un municipio: Por esa razón se encuentra en una posición tan alta. Si no consideramos a municipios de los que dependan pocas localidades, por ejemplo filtramos para visualizar municipios con almenos cuatro localidades dependientes y además dejamos a parte a la capital de provincia estos son los 10 municipios más importantes:
+
+```{r, echo = FALSE, fig.align='center'}
+norma1
+```
+
+Destacan Antequera y Marbella, luego existe un grupo intermedio en el que se encuentran Coín, Estepona, Vélez-Málaga, Torremolinos y Ronda. Los últimos tres municipios reciben una afluencia bastante menor, pero no los podemos descartar aún. Es posible que su localización geográfica o los municipios de los que provienen sus flujos sean convenientes para su selección como cabecera. Veamos ahora dónde se encuentran en el mapa, después evaluaremos qué municipios son candidatos a primera vista y cuales habrá que comparar para quedarse con uno de ellos.
+
+```{r, echo = FALSE, out.width = "100%", fig.align='center', fig.show='hold'}
+#| fig.cap = "Localización de los 10 municipios con mayor afluencia normalizada
+#|  sin contar con Málaga ni Fuengirola."
+include_graphics("grafs/selec_1.png")
+```
+
+
+Empezamos por considerar a los candidatos que se encuentran lejos de otros. Ronda está relativamente alejado de otras potenciales cabeceras y cubre relativamente bien parte del oeste de la provincia.
+
+Si nos fijamos en la parte más hacia el norte notaremos que Antequera, Álora y Campillo están colindando. Probablemente habrá que escoger solo a uno de estos tres. La situación geográfica favorece a Antequera dado que se encuentra más alejada de otras posibles cabeceras y más cerca de los extremos al noreste de la provincia. Desde este punto de vista también hay que tener en cuenta que tanto su área como su perímetro son considerablemente más extensos que los de Álora o Campillo. Otro argumento es que el flujo que recibe es mayor al que reciben los otros dos municipios. Sin embargo habrá que examinar de dónde vienen esos flujos y si Antequera es una buena cabecera para esta zona de Málaga.
+
+Nos dirigimos ahora hacia el suroeste de la provincia, allí vemos que hay otras dos posibles cabeceras colindando: Estepona y Marbella. En este caso los argumentos cartográficos no son tan evidentes. Ambas tienen una extensión similar y pueden recibir flujos de localidades cercanas. A favor del caso de Estepona podemos decir que no hay otros candidatos más hacia el oeste y que si la ciudad recibe los flujos de estas localidades tendría justificada la categoría de cabecera comarcal. Por otra parte en general Marbella recibe más afluencia y también podría recibir los flujos de una zona sin muchos candidatos. Si bien es cierto que al este y al norte de Marbella hay algunos municipios que aspiran a ser cabecera su estatus no es del todo cierto y, si no lo fueran Marbella podría abastecer a los municipios de la zona. No obstante cabe la posibilidad de que dos cabeceras se toquen, a pesar de que no parezca una solución favorable a primera vista, en función de la procedencia de los flujos de estas localidades y de la elección de otras cabeceras sería razonable que Estepona y Málaga fueran cabeceras de comarcas distintas.
+
+Fijémonos ahora en el extremo oeste de la provincia, allí vemos que hay dos candidatos a cabecera: Vélez-Málaga y Nerja. Esta última se encuentra en la frontera provincial y podría atraer flujos de esa zona. Sinembargo, en general no recibe una gran afluencia. Podríamos tomar varias decisiones en función del lugar de dónde provengan los flujos: Si Nerja recoge los flujos de sus alrededores y no depende  mucho de Vélez-Málaga podría ser la cabecera de la zona más hacia el oeste. Si por lo contrario Vélez-Málaga recoge bien los desplazamientos de la zona ésta sería la única cabecera. Una tercera opción es considrear a la capital provincial también capital comarcal, en este caso Vélez-Málaga ya no sería cabecera justificando así la categoría para Nerja. Esta decisión dependerá en gran medida de las otras cabeceras seleccionadas.
+
+Finalmente consideramos a Coín y Torremolinos, que se encuentran entre todos los grupos de cabeceras comentadis anteriorment. Al norte tienen a Álora y Antequera, al oeste está Marbella y al este se encuentra la capital provincial al lado de Vélez-Málaga. Como consecuencia de esta situación geográfica y de forma similar al grupo anterior, su selección dependerá en buena medida de qué cabeceras sean seleccionadas en el resto de casos. Siempre y cuando la procedencia de sus flujos sea la adecuada y la zona necesite ser cubierta por una cabecera podrán ser seleccionadas como cabecara.
+
+De modo que el siguiente paso es plantearse una serie de comparaciones entre candidatos que estén ordenadas de menos dependiente de otras selecciones a más dependiente de otras selecciones. Realizaremos comparaciones dos a dos en cada grupo y tomaremos una decisión, seguidamente pasaremos a las comparaciones del siguiente grupo teniendo en cuenta la selección anterior. El orden de comparaciones será el siguiente:
+
+
+\begin{enumerate}
+  \setcounter{enumi}{0}
+  \item Partimos con Ronda como cabecera
+  \item Antequera, Campillos y Álora
+  \item Marbella y Estepona
+  \item Vélez-Málaga y Nerja
+  \item Torremolinos y Coín
+\end{enumerate}
+
+Cabe remarcar que al seleccionar las cabeceras también consideramos los municipios que se adherirán a cada una de ellas. Por tanto tendremos una idea más o menos clara de cuál será la agrupación comarcal final. Sin embargo surgirán dudas al respeco de algunos municipios qu resolveremos en el apartado siguiente. Para realizar dicha selección emplearemos una tipología de figura que introducimos a continuación.
+
+El siguiente gráfico condensa información de varios tipos. Trabaja con los flujos sin transformar, es decir representando la cantidad de personas que se desplazan de un municipio a otro. Compara dos municipios que son potencialmente cabeceras así que lo hace desde la perspectiva de éstos como destino. Pretende representar el lugar de origen  de los flujos y la medida de los mismos en pro de la comparación de destinos.
+
+Dibujamos los municipios que comparamos y aquellos que dependen de alguno de ellos, los pintamos de tres colores: Por un lado el azul y el morado se indentifican con un destino u otro. Por otro lado el verde y el gris nos dan aportan información sobre la localidad de origen, si ésta depdende de ambos destinos la pintamos en verde y si solo depende de uno en gris. Adicionalmente trazamos un mapa  más pequeño de la provincia entera que nos sirve para contextualizar la localización de los municipios que representamos en la parte principal.
+
+La característica más importante de esta figura son los círculos coloreados que encontramos en los centroides de las localidades de origen: Corresponden a la diferencia de flujo entre los dos municipios, el color nos informa de qué destino es más importante para éste y su tamaño es proporcional a la dimensión de la diferencia. Así en los municipios de origen pintados de gris la cantidad utilizada para calcular el color y radio del cículo es simplemente el flujo hacia su destino. Sin embargo en los orígenes pintados de verde la cantidad utilizada es la diferencia entre el flujo en una dirección y la otra.
+
+### Antequera, Campillos y Álora
+
+En la figura 4 podemos comprobar que Antequera es destino de desplazamientos desde prácticamente la totalidad de los municipios situados al noreste de la provincia. Por otro lado Campillos atrae flujos de menos localidades, todas situadas al oeste de Antequera. Sin embargo, en términos generales, aquellos municipios que envían flujos a Campillos también lo hacen a Antequera en mayor medida. Por tanto concluimos que Antequera es una cabecera satisfactoria y puesto que también abarca los municipios que dependen de Campillos, éste último municipio no será cabecera.
+
+```{r, echo = FALSE, out.width = "100%", fig.align='center', fig.show='hold'}
+#| fig.cap = "Comparación de Antequera y Campillos como potenciales cabeceras
+#|  según la procedencia y origen de sus flujos."
+include_graphics("grafs/selec_11.png")
+```
+
+En la figura 5 equiparamos Antequera y Álora. En contraste con la anterior comparación esta pareja recibe flujos de localidades distintas, es decir son focos de influencia para zonas diferentes. Este característica favorece la selección de ambas localidades como cabecera. Adicionalmente Álora atrae flujos de una zona que no tiene una cabecera clara. De modo que Antequera y Álora pueden coexistir como cabeceras ya que sus zonas de influencia se complementan bien. No obstante la categoría de cabecera para Álora dependerá de su comparación con otras potenciales cabeceras que puedan abarcar los flujos de la misma zona, como Coín.
+
+```{r, echo = FALSE, out.width = "100%", fig.align='center', fig.show='hold'}
+#| fig.cap = "Comparación de Antequera y Álora como potenciales cabeceras
+#|  según la procedencia y origen de sus flujos."
+include_graphics("grafs/selec_12.png")
+```
+
+### Marbella y Estepona
+
+Nos diriguimos ahora al suroeste de la provincia fijándonos en la figura 6, en la que contraponemos Marbella y Estepona. Vemos que a pesar de los argumentos de localización geográfica a favor de Estepona que habíamos comentado en secciones anteriores Marbella recibe flujos de todos los municipios que desplazan personas hacia Estepona y casi siempre en mayor medida. Adicionalmente Estepona depende de la misma Marbella en una cantidad considerable. Por lo tanto resulta más adecuado seleccionar a Marbella como cabecera eliminando así la posibilidad de que Estepona ostente el mismo estatus.
+
+```{r, echo = FALSE, out.width = "100%", fig.align='center', fig.show='hold'}
+#| fig.cap = "Comparación de Campillos y Álora como potenciales cabeceras
+#|  según la procedencia y origen de sus flujos."
+include_graphics("grafs/selec_2.png")
+```
+
+### Vélez-Málaga y Nerja
+
+```{r, echo = FALSE, out.width = "100%", fig.align='center', fig.show='hold'}
+#| fig.cap = "Comparación de Campillos y Álora como potenciales cabeceras
+#|  según la procedencia y origen de sus flujos."
+include_graphics("grafs/selec_3.png")
+```
+
+### Torremolinos y Coín
+
+```{r, echo = FALSE, out.width = "100%", fig.align='center', fig.show='hold'}
+#| fig.cap = "Comparación de Campillos y Álora como potenciales cabeceras
+#|  según la procedencia y origen de sus flujos."
+include_graphics("grafs/selec_4.png")
 ```
 
 \newpage
