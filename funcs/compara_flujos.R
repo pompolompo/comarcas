@@ -36,9 +36,11 @@ compara_flujos = function(nb, # nombre de los municipios a comparar
   ### mapa ###
   mf_theme("candy")
   
+  pal = c("#00A890", "grey")
+  if(length(unique(x$AMBOS)) == 1) pal = "grey"
   # comparación de flujos
   mf_map(participan, var = "AMBOS", type = "typo", expandBB = expa,
-         pal = c("#00A890", "grey"), leg_frame = TRUE, leg_pos = "interactive")
+         pal = pal, leg_frame = TRUE, leg_pos = "interactive")
   mf_map(comparados, var = "nombre", type = "typo", add = TRUE,
          leg_pos = NA , leg_frame = TRUE, pal = c("#422C70", "#00598B"))
   mf_map(participan, var = c("DIFERENCIA", "DIRECCIÓN"), type = "prop_typo", add = TRUE,

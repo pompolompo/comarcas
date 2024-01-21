@@ -156,3 +156,39 @@ for(m in sumas$DESTINO[1:n]){
   mf_arrow(pos = "topright")
   
 }
+
+### cabecaeras seleccionadas y 
+## cantidad de cabeceras dependientes para cada municipio de adhesión
+
+# cabeceras
+nb = c("Ronda", "Antequera", "Marbella", "Vélez-Málaga", "Álora")
+cd = codigo_nombre(nb, nb_a_id = T, num = T)
+
+# dependientes
+dep0 = filter(flux0, DESTINO %in% cd) %>% 
+  pull(ORIGEN) %>% as.factor() %>% summary()
+
+dep1 = names(dep0[dep0 == 1]) # de una cabecera
+dep2 = names(dep0[dep0 == 2]) # de dos cabeceras
+dep0 = names(dep0) # de alguno
+no_dep = shp$cod_mun[!(shp$cod_mun %in% dep0)]
+no_dep = no_dep[!(as.numeric(no_dep) %in% cd)]
+# de ninguno
+
+# shapefile
+s0 = mutate(shp, 'Depende de:' = ifelse(!(shp$cod_mun %in% dep0),
+                                        0,
+                                        ifelse(shp$cod_mun %in% dep1,
+                                               1, 2)))
+s1 = filter(shp, nombre %in% nb)
+
+# mapa
+mf_map(shp)
+mf_map(s0, var = 'Depende de:', type = "typo", leg_frame = TRUE, leg_pos = "topright")
+mf_map(s1, var = 'provincia', type = "typo", leg_pos = NA, add = TRUE, pal = "black")
+mf_label(s1, var = "nombre", cex = 0.75, halo = TRUE, r = 0.15)
+mf_layout(title = "Cantidad de cabeceras de las que dependen los otros municipios", 
+          credits = paste0(
+            "Fuente: Universidad de Sevilla\n",
+            "mapsf ",
+            packageVersion("mapsf")))
