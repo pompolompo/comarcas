@@ -30,7 +30,8 @@ desplaza = mutate(flux00, d = ifelse(SE_TOCAN, 1, DISTANCIA)) %>%
                      .keep = "none") %>% select(' Proporción', 'Desplazamientos')) %>%
   kable(booktabs = TRUE, format = "latex", align = "c",
         caption = "Personas desplazadas y km según motivo") %>%
-  kable_styling(latex_options = c("striped", "hold_position")) %>%
+  kable_styling(latex_options = c("striped", "hold_position"),
+                full_width = FALSE) %>%
   add_header_above(c("", "Kilómetros" = 2, "Desplazamientos" = 2)) %>%
   footnote(general = "Desplazamientos y kilómetros redondeados a números enteros",
            general_title = "Nota:", footnote_as_chunk = TRUE)
@@ -51,7 +52,8 @@ top7 = sumas %>% rename(
                 function(x) round(x/1000, 2))) %>% 
   kable(booktabs = TRUE, format = "latex", align = "c",
         caption = "Municipios con mayores flujos entrantes") %>% 
-  kable_styling(latex_options = c("striped", "hold_position")) %>%
+  kable_styling(latex_options = c("striped", "hold_position"),
+                full_width = FALSE) %>%
   footnote(general_title = "La tipología de los flujos es, de izquierda a derecha:",
            general = "Total; Comercio; Educación; Sanidad; Administración; Ocio y Cultura; Transportes; Otros ",
            footnote_as_chunk = FALSE, title_format = "underline") %>%
@@ -70,9 +72,10 @@ pondera = kable(w, booktabs = TRUE, format = "latex", align = "c",
 ## cabecera ##
 
 norma0 = arrange(normal, desc(ENTRANTE)) %>%
-  head(10) %>%
+  head(10) %>% select(n ,everything()) %>%
   kable(booktabs = TRUE, format = "latex", align = "c",
-        caption = "Flujos entrantes normalizados") %>%
+        caption = "Flujos entrantes normalizados",
+        full_width = FALSE) %>%
   kable_styling(latex_options = c("striped", "hold_position")) %>%
   footnote(general_title = "Nota:",
            general = "Se muestran municipios con los 10 mayores flujos entrantes",
@@ -80,10 +83,11 @@ norma0 = arrange(normal, desc(ENTRANTE)) %>%
   
 norma1 = arrange(normal, desc(ENTRANTE)) %>%
   filter(n > 3, n < 30) %>%
-  head(10) %>%
+  head(10) %>% select(n, everything()) %>%
   kable(booktabs = TRUE, format = "latex", align = "c",
         caption = "Flujos entrantes normalizados") %>%
-  kable_styling(latex_options = c("striped", "hold_position")) %>%
+  kable_styling(latex_options = c("striped", "hold_position"),
+                full_width = FALSE) %>%
   footnote(general_title = "Nota:",
            general = "Se muestran municipios con los 10 mayores flujos entrantes",
            footnote_as_chunk = TRUE, title_format = "underline")
