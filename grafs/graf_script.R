@@ -1,8 +1,6 @@
 library(ggplot2)
 source("scripts/import.R")
-source("scripts/descriptiva.R")
 source("scripts/prepara_flujos.R")
-source("scripts/selec_cabecera.R")
 ### AGRUPACIÓN ###
 
 ## descriptiva ##
@@ -73,6 +71,33 @@ ggsave("grafs/descr_3.png")
 
 ### SELECCIÓN CABECERAS ###
 
+# localización 10 municipios más importantes (filtrando) # selec_1
+
+m = arrange(normal, desc(ENTRANTE)) %>%
+  filter(n > 3, n < 30) %>% 
+  select(DESTINO, ENTRANTE) %>% head(10)
+
+shp$cabecera = ifelse(shp$nombre %in% m$DESTINO, 
+                      "Cabecaera", "Adherible")
+s0 = mutate(shp, top10 = nombre %in% m$DESTINO)
+s1 = filter(s0, top10) %>%
+  .[order(.[["nombre"]]), ] %>%
+  mutate(flujo = m[order(m$DESTINO[1:10]), "ENTRANTE"] %>% pull()) %>%
+  .[order(.[["flujo"]], decreasing = TRUE),] %>%
+  mutate(pinta = paste0(1:10, ". ", nombre))
+
+mf_export(x = s0, filename = "grafs/selec_1.png", width = 1000)
+
+mf_map(shp, var = "cabecera", type ="typo", 
+       leg_pos = "topright", leg_frame = TRUE, leg_title = "Municipio")
+mf_label(x = s1, var = "pinta",
+         cex = 0.75, halo = TRUE, r = 0.15)
+mf_layout(title = "Municipios con mayor flujo entrante normalizado", 
+          credits = paste0(
+            "Fuente: Universidad de Sevilla\n",
+            "mapsf ",
+            packageVersion("mapsf")))
+dev.off()
 
 # gráfica con los municipios dependientes de los 7 anteriores
 dev.new()

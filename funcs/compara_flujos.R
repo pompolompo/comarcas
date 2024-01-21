@@ -7,8 +7,8 @@ source("scripts/prepara_flujos.R")
 compara_flujos = function(nb, # nombre de los municipios a comparar
                           shp, # shapefile general
                           flux0, # flujos ponderados
-                          f = c(.7, .975, .05, .3), # coordenadas mapa inset
-                          l = "topright" # posición de la leyenda
+                          expa = c(.25, 0, 0, .35), # expansión marco (abajo, izq, arriba, derecha)
+                          fig = c(.65, .975, .05, .4) # marco mapa interior
                           ){
   
   # origen, diferencia y destino mayoritario
@@ -22,8 +22,10 @@ compara_flujos = function(nb, # nombre de los municipios a comparar
     ) %>% mutate(
       DIFERENCIA = abs(pick(nb[1]) - pick(nb[2]))[,1],
       'DIRECCIÓN' = ifelse(pick(nb[1]) > pick(nb[2]),
-                           nb[1], nb[2])[,1]) %>%
-    select(ORIGEN, DIFERENCIA, DIRECCIÓN)
+                           nb[1], nb[2])[,1],
+      AMBOS = ifelse(pick(nb[1]) == 0 | pick(nb[2]) == 0, 
+                     "Uno", "Ambos")) %>%
+    select(ORIGEN, DIFERENCIA, DIRECCIÓN, AMBOS)
   
   # partes del mapa a usar
   comparados = filter(shp, nombre %in% nb)
@@ -35,10 +37,13 @@ compara_flujos = function(nb, # nombre de los municipios a comparar
   mf_theme("candy")
   
   # comparación de flujos
-  mf_map(cercanos)
-  mf_map(comparados, var = "nombre", type = "typo", add = TRUE, leg_pos = NA)
-  mf_map(participan, var = c("DIFERENCIA", "DIRECCIÓN"), type = "prop_typo", 
-         leg_pos = l, leg_frame = TRUE)
+  mf_map(participan, var = "AMBOS", type = "typo", expandBB = expa,
+         pal = c("#00A890", "grey"), leg_frame = TRUE, leg_pos = "interactive")
+  mf_map(comparados, var = "nombre", type = "typo", add = TRUE,
+         leg_pos = NA , leg_frame = TRUE, pal = c("#422C70", "#00598B"))
+  mf_map(participan, var = c("DIFERENCIA", "DIRECCIÓN"), type = "prop_typo", add = TRUE,
+         leg_pos = "topright", leg_frame = TRUE, pal = c("#422C70", "#00598B"))
+  
   mf_layout(title = paste("Comparación de flujos entre", nb[1], "y", nb[2]),
             credits = paste0(
               "Fuente: Universidad de Sevilla\n",
@@ -47,10 +52,11 @@ compara_flujos = function(nb, # nombre de los municipios a comparar
             ))
 
   # posición en el mapa general
-  mf_inset_on(fig = f)
+  mf_inset_on(fig = fig)
   mf_map(shp)
-  mf_map(filter(shp, nombre %in% c(comparados$nombre, participan$nombre)),
-         var = "provincia", type = "typo", leg_pos = NA, add = TRUE, pal = "black")
+  mf_map(filter(shp, nombre %in% c(participan$nombre, comparados$nombre)),
+         var = "provincia", type = "typo", leg_pos = NA, 
+         add = TRUE, pal = "black")
   mf_scale(pos = "bottomleft")
   mf_inset_off()
   return(invisible())
