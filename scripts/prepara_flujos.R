@@ -87,3 +87,41 @@ normal = flux0 %>%
       ENTRANTE = 0
     )
   ) %>% arrange(desc(ENTRANTE))
+
+
+# municipios dependientes de una o más cabeceras
+
+# cabeceras
+nb = c("Ronda", "Antequera", "Marbella", "Vélez-Málaga", "Álora")
+cd = codigo_nombre(nb, nb_a_id = T, num = T)
+
+# relaciones dependencia
+dep0 = filter(flux0, DESTINO %in% cd) %>% 
+  select(ORIGEN, DESTINO) %>% 
+  group_by(ORIGEN) %>% 
+  summarise(d = paste(DESTINO, collapse = ", ")) %>% 
+  arrange(desc(str_length(d)))
+
+# relaciones dependencia con nombre y separadas
+dep = dep0[10:nrow(dep0),] %>% mutate(
+  d1 = d,
+  d2 = NA,
+  .keep = "unused"
+) %>% bind_rows(
+  dep0[1:9,] %>% mutate( 
+    d1 = strsplit(d, split = ", ") %>% unlist() %>% .[seq(1, 18, 2)],
+    d2 = strsplit(d, split = ", ") %>% unlist() %>% .[seq(2, 18, 2)],
+    .keep = "unused")
+) %>%
+  mutate(
+    ORIGEN = codigo_nombre(ORIGEN),
+    CABECERA = codigo_nombre(d1),
+    DESTINO_2 = codigo_nombre(d2),
+    .keep = "none"
+  ) %>% bind_rows(
+    data.frame(
+      ORIGEN = shp$nombre[!(shp$nombre %in% .[["ORIGEN"]])],
+      CABECERA = NA,
+      DESTINO_2 = NA
+    )
+  )

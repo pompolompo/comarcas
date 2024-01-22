@@ -55,6 +55,13 @@ mf_layout(title = "Municipios con mayor flujo entrante",
             packageVersion("mapsf")))
 dev.off()
 
+# flujos normalizados según #mun dep
+ggplot(normal, aes(x = ENTRANTE, fill = cut(n, breaks = c(-Inf, 3, 10, 25, Inf)))) +
+  geom_histogram(binwidth = .25) +
+  labs(title = "Histograma de flujos normalizados según cantidad de municipios dependientes") +
+  theme_bw() + theme(legend.title = element_blank())
+ggsave(filename = "grafs/normalflux1.png")
+
 
 # proporción de flujos en los 7 municipios más importantes --> descr_3
 data.frame(
@@ -164,31 +171,147 @@ for(m in sumas$DESTINO[1:n]){
 nb = c("Ronda", "Antequera", "Marbella", "Vélez-Málaga", "Álora")
 cd = codigo_nombre(nb, nb_a_id = T, num = T)
 
-# dependientes
+# relaciones dependencia
 dep0 = filter(flux0, DESTINO %in% cd) %>% 
-  pull(ORIGEN) %>% as.factor() %>% summary()
+  select(ORIGEN, DESTINO) %>% 
+  group_by(ORIGEN) %>% 
+  summarise(d = paste(DESTINO, collapse = ", ")) %>% 
+  arrange(desc(str_length(d)))
 
-dep1 = names(dep0[dep0 == 1]) # de una cabecera
-dep2 = names(dep0[dep0 == 2]) # de dos cabeceras
-dep0 = names(dep0) # de alguno
-no_dep = shp$cod_mun[!(shp$cod_mun %in% dep0)]
-no_dep = no_dep[!(as.numeric(no_dep) %in% cd)]
-# de ninguno
+# relaciones dependencia con nombre y separadas
+dep = dep0[10:nrow(dep0),] %>% mutate(
+  d1 = d,
+  d2 = NA,
+  .keep = "unused"
+) %>% bind_rows(
+  dep0[1:9,] %>% mutate( 
+    d1 = strsplit(d, split = ", ") %>% unlist() %>% .[seq(1, 18, 2)],
+    d2 = strsplit(d, split = ", ") %>% unlist() %>% .[seq(2, 18, 2)],
+    .keep = "unused")
+) %>%
+  mutate(
+    ORIGEN = codigo_nombre(ORIGEN),
+    CABECERA = codigo_nombre(d1),
+    DESTINO_2 = codigo_nombre(d2),
+    .keep = "none"
+  ) %>% bind_rows(
+    data.frame(
+      ORIGEN = shp$nombre[!(shp$nombre %in% .[["ORIGEN"]])],
+      CABECERA = NA,
+      DESTINO_2 = NA
+    )
+  )
 
-# shapefile
-s0 = mutate(shp, 'Depende de:' = ifelse(!(shp$cod_mun %in% dep0),
-                                        0,
-                                        ifelse(shp$cod_mun %in% dep1,
-                                               1, 2)))
-s1 = filter(shp, nombre %in% nb)
+s = left_join(shp, dep, by = join_by(nombre == ORIGEN)) %>%
+  mutate(DESTINOS = ifelse(
+           is.na(CABECERA), 0,
+           ifelse(
+             is.na(DESTINO_2), 1, 2
+           )
+         ))
 
-# mapa
-mf_map(shp)
-mf_map(s0, var = 'Depende de:', type = "typo", leg_frame = TRUE, leg_pos = "topright")
-mf_map(s1, var = 'provincia', type = "typo", leg_pos = NA, add = TRUE, pal = "black")
-mf_label(s1, var = "nombre", cex = 0.75, halo = TRUE, r = 0.15)
-mf_layout(title = "Cantidad de cabeceras de las que dependen los otros municipios", 
+# color cabecera 1
+mf_map(arrange(s, CABECERA), var = "CABECERA", type = "typo", 
+       leg_pos = "topright", leg_frame = TRUE)
+# cabeceras
+mf_map(filter(s, nombre %in% nb), lwd = 3,
+       var = "nombre", type = "typo", add = TRUE, leg_pos = NA)
+mf_map(filter(s, nombre == "Málaga"), lwd = 3,
+       var = "nombre", type = "typo", add = TRUE, leg_pos = NA, pal = "grey22")
+# municipios entre 2 cabeceras
+mf_map(filter(s, DESTINOS == 2), var = "DESTINOS", type = "prop",
+       leg_pos = NA, inches = .1)
+
+mf_layout(title = "Agregación comarcal 1",
           credits = paste0(
             "Fuente: Universidad de Sevilla\n",
             "mapsf ",
-            packageVersion("mapsf")))
+            packageVersion("mapsf")
+          ))
+
+
+### links ### (s es el mismo mapa que el de arriba)
+
+nombre = "Alfarnate"
+k = codigo_nombre(nombre, nb_a_id = T, num= T)
+
+x = shp
+y = filter(flux0, ORIGEN == k)
+l = mf_get_links(x = shp[,-1], df = filter(flux0, ORIGEN == k))
+
+bks = mf_get_breaks(l$FLUJO[,1], nbreaks = 3, "jenks")
+
+# color cabecera 1
+mf_map(arrange(s, CABECERA), var = "CABECERA", type = "typo", 
+       leg_pos = "topright", leg_frame = TRUE)
+# cabeceras
+mf_map(filter(s, nombre %in% nb), lwd = 3,
+       var = "nombre", type = "typo", add = TRUE, leg_pos = NA)
+mf_map(filter(s, nombre == "Málaga"), lwd = 3,
+       var = "nombre", type = "typo", add = TRUE, leg_pos = NA, pal = "grey22")
+# links
+mf_map(l, var = "FLUJO", type = "grad", breaks = bks, lwd = (1:(length(bks)-1))*2, 
+       col = "red4", add = TRUE, leg_pos = "interactive", leg_frame = TRUE)
+
+mf_layout(title = paste("Flujos procedentes de", nombre),
+          credits = paste0(
+            "Fuente: Universidad de Sevilla\n",
+            "mapsf ",
+            packageVersion("mapsf")
+          ))
+
+## agrupación final
+
+x = filter(dep, !is.na(DESTINO_2) | is.na(CABECERA)) %>%
+  filter(!(ORIGEN %in% c("Ronda", "Antequera", "Marbella", "Vélez-Málaga", "Álora", "Málaga"))) %>%
+  mutate(CABECERA = c(
+    "Antequera",    # Alfarnate
+    "Antequera",    # Alfarnatejo
+    "Antequera",    # Almargen
+    "Álora",        # Ardales
+    "Antequera",    # Cañete la Real
+    "Álora",        # Carratraca
+    "Marbella",     # Jubrique
+    "Antequera",    # Riogordo
+    "Antequera",    # Teba
+    "Ronda",        # Montecorto
+    "Antequera",    # Villanueva de la Concepción
+    "Vélez-Málaga", # Macharaviaya
+    "Ronda",        # Cartajima
+    "Marbella",     # Benalmádena
+    "Vélez-Málaga", # Torrox
+    "Antequera",    # Villanueva del Trabuco
+    "Ronda",        # Serrato
+    "Vélez-Málaga", # Totalán
+    "Álora",        # Alhaurín de la Torre
+    "Álora",        # Coín
+    "Marbella",     # Genalguacil
+    "Ronda",        # Júzcar
+    "Ronda",        # Parauta
+    "Marbella"      # Torremolinos
+  )) %>% select(-DESTINO_2) %>%
+  right_join(., dep, by = "ORIGEN") %>% 
+  select(-DESTINO_2) %>%
+  mutate(
+    ORIGEN = ORIGEN,
+    CABECERA = c(CABECERA.x[1:24], CABECERA.y[25:97], ORIGEN[98:103]),
+    .keep = "unused"
+  )
+
+x$CABECERA[x$ORIGEN == "Almáchar"] = "Vélez-Málaga"
+sxp = left_join(shp, x, join_by(nombre == ORIGEN))
+
+mf_map(sxp, var = "CABECERA", type = "typo", 
+       leg_pos = "topright", leg_frame = TRUE)
+mf_map(filter(sxp, nombre %in% c("Ronda", "Antequera", "Marbella", 
+                                 "Vélez-Málaga", "Álora", "Málaga")),
+       var = "CABECERA", type = "typo", lwd = 3, add = TRUE, leg_pos = NA)
+mf_label(filter(sxp, nombre %in% c("Ronda", "Antequera", "Marbella", 
+                                   "Vélez-Málaga", "Álora", "Málaga")), 
+         var = "nombre", cex = 1, halo = TRUE, r = 0.15)
+mf_layout(title = "Agrupación comarcal definitiva",
+          credits = paste0(
+            "Fuente: Universidad de Sevilla\n",
+            "mapsf ",
+            packageVersion("mapsf")
+          ))

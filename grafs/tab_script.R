@@ -91,3 +91,45 @@ norma1 = arrange(normal, desc(ENTRANTE)) %>%
   footnote(general_title = "Nota:",
            general = "Se muestran municipios con los 10 mayores flujos entrantes",
            footnote_as_chunk = TRUE, title_format = "underline")
+
+### adhesión ###
+
+# relaciones dependencia
+dep0 = filter(flux0, DESTINO %in% cd) %>% 
+  group_by(ORIGEN) %>% 
+  summarise(d = paste(DESTINO, collapse = ", ")) %>% 
+  arrange(desc(str_length(d)))
+
+# relaciones dependencia con nombre y separadas
+dep = dep0[10:nrow(dep0),] %>% mutate(
+  d1 = d,
+  d2 = NA,
+  .keep = "unused"
+) %>% bind_rows(
+  dep0[1:9,] %>% mutate( 
+    d1 = strsplit(d, split = ", ") %>% unlist() %>% .[seq(1, 18, 2)],
+    d2 = strsplit(d, split = ", ") %>% unlist() %>% .[seq(2, 18, 2)],
+    .keep = "unused")
+) %>%
+  mutate(
+    ORIGEN = codigo_nombre(ORIGEN),
+    CABECERA = codigo_nombre(d1),
+    DESTINO_2 = codigo_nombre(d2),
+    .keep = "unused"
+  ) %>% bind_rows(
+    data.frame(
+      ORIGEN = shp$nombre[!(shp$nombre %in% .[["ORIGEN"]])],
+      CABECERA = NA,
+      DESTINO_2 = NA
+    )
+  )
+
+# tabla
+depende2 = filter(dep, !is.na(DESTINO_2)) %>% 
+  arrange(CABECERA, DESTINO_2) %>%
+  rename('DESTINO 1' = CABECERA, 
+         'DESTINO 2' = DESTINO_2) %>%
+  kable(booktabs = TRUE, format = "latex", align = "c",
+        caption = "Municipios que dependen de dos cabeceras") %>%
+  kable_styling(latex_options = c("striped", "hold_position"),
+                full_width = FALSE)
